@@ -22,7 +22,9 @@ Use the colon : symbol as a prompt for each command line. Be sure you flush out 
 
 The general syntax of a command line is:
 
-```command [arg1 arg2 ...] [< input_file] [> output_file] [&]```
+```
+command [arg1 arg2 ...] [< input_file] [> output_file] [&]
+```
 
 …where items in square brackets are optional.  You can assume that a command is made up of words separated by spaces. The special symbols <, >, and & are recognized, but they must be surrounded by spaces like other words. If the command is to be executed in the background, the last word must be &. If the & character appears anywhere else, just treat it as normal text. If standard input or output is to be redirected, the > or < words followed by a filename word must appear after all the arguments. Input redirection can appear before or after output redirection.
 
