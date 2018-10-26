@@ -200,7 +200,8 @@ I _**HIGHLY**_ recommend that you develop this program directly on our course se
 
 If you do see `^M` characters all over your files, try this command:
 
-```$ dos2unix bustedFile
+```
+$ dos2unix bustedFile
 ```
 
 # What to Turn In and When
