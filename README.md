@@ -159,17 +159,20 @@ background pid is 4963
 
 In addition to your shell needing to replicate the above example in functionality, this assignment is provided with the actual [grading test script](https://oregonstate.instructure.com/courses/1725991/files/71920033/download?verifier=TVk9ApsV01oBsQB3AYS2fWFc9YSWQb4plS54koXh&wrap=1) that will be used to assign your program a grade. Your program must function with this grading script, as follows. To run it, place it in the same directory as your compiled shell, chmod it (chmod +x ./p3testscript) and run this command from a bash prompt:
 
-```$ p3testscript 2>&1
+```
+$ p3testscript 2>&1
 ```
 
 or
 
-```$ p3testscript 2>&1 | more
+```
+$ p3testscript 2>&1 | more
 ```
 
 or
 
-```$ p3testscript > mytestresults 2>&1
+```
+$ p3testscript > mytestresults 2>&1
 ```
 
 Don’t worry if the spacing, indentation, or look of the output of the script is different than when you run it interactively: that won’t affect your grade. The script may add extra colons at the beginning of lines or do other weird things, like put output about terminating processes further down the script than you intended. Use the script to prepare for your grade, as this is how it's being earned.
