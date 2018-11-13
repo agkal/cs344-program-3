@@ -111,6 +111,7 @@ int main()
 					{
 						// exec code
 					}
+					exit(-1);
 				default: // parent process
 					if (bgProcessFlag == true)
 					{
@@ -130,4 +131,39 @@ int main()
 		}
 	}
 	return 0;
+}
+
+void initShellState()
+{
+
+}
+
+void resetCommandStateVariables()
+{
+
+}
+
+void checkBGProcesses()
+{
+
+}
+
+void getInput()
+{
+
+}
+
+void dollarSignExpansion()
+{
+
+}
+
+void parseInput()
+{
+
+}
+
+void killBGProcesses()
+{
+
 }
