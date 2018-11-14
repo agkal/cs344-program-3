@@ -419,6 +419,7 @@ void parseInput()
 		else if (strcmp(token, ">") == 0)
 		{
 			isBGLastArg = false;
+			outputRedirFlag = true;
 			token = strtok(NULL, " ");
 			strcpy(outputRedirLoc, token);
 		}
