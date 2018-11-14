@@ -382,11 +382,11 @@ void resetCommandStateVariables()
 
 void getInput()
 {
-	printf(": ");
-	fflush(stdout);
 	// from stackoverflow on how signals can stop fgets mid system call
 	// https://stackoverflow.com/questions/46146240/why-does-alarm-cause-fgets-to-stop-waiting
 	do {
+		printf(": ");
+		fflush(stdout);
 		errno = 0;
 		fgets(inputString, sizeof(inputString), stdin);
 	} while (EINTR == errno);
@@ -524,14 +524,14 @@ void catchSIGTSTP(int signo)
 	if (allowBGFlag == true)
 	{
 		allowBGFlag = false;
-		char* message = "Entering foreground-only mode (& is now ignored)\n";
+		char* message = "\nEntering foreground-only mode (& is now ignored)\n";
 		write(1, message, 49);
 		fflush(stdout);
 	}
 	else
 	{
 		allowBGFlag = true;
-		char* message = "Exiting foreground-only mode\n";
+		char* message = "\nExiting foreground-only mode\n";
 		write (1, message, 29);
 		fflush(stdout);
 	}
