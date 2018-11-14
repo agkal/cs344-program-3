@@ -45,12 +45,28 @@ void parseInput();
 void killBGProcesses();
 void checkBGProcesses();
 
-void catchSIGTSTP();
+void catchSIGTSTP(int signo);
 
 
 int main()
 {
+	// signal code heavily referenced from in class powerpoint
 	// signal stuff goes here
+	struct sigaction SIGINT_action = {0};
+	SIGINT_action.sa_handler = SIG_DFL;
+	sigfillset(&SIGINT_action.sa_mask);
+	SIGINT_action.sa_flags = 0;
+
+	struct sigaction SIGTSTP_action = {0};
+	SIGTSTP_action.sa_handler = catchSIGTSTP;
+	sigfillset(&SIGTSTP_action.sa_mask);
+	SIGTSTP_action.sa_flags = 0;
+
+	struct sigaction ignore_action = {0};
+	ignore_action.sa_handler = SIG_IGN;
+
+	sigaction(SIGINT, &ignore_action, NULL);
+	sigaction(SIGTSTP, &SIGTSTP_action, NULL);
 
 
 	// call sigaction
@@ -91,7 +107,14 @@ int main()
 		}
 		else if (cdCommandFlag == true)
 		{
-			//change dir
+			if (commandArgs[1] != NULL)
+			{
+				chdir(commandArgs[1])
+			}
+			else
+			{
+				chdir(getenv("HOME"));
+			}
 		}
 		else if (externalCommandFlag == true)
 		{
@@ -103,39 +126,157 @@ int main()
 					printf("fork failed\n");
 					fflush(stdout);
 				case 0: // child
+					int fdin;
+					int fdout;
+					int daijoubu;
+
 					// signal stuff for children to ignore ctrl+z
+					sigaction(SIGTSTP, &ignore_action, NULL);
+
 					if (bgProcessFlag == true && allowBGFlag == false)
 					{
-						exit(0);
+						exit(-5);
 					}
 					// foreground
 					if (bgProcessFlag == false)
 					{
 						// signal stuff for foreground and ctrl+c
+						sigaction(SIGINT, &SIGINT_action, NULL);
+
 						if (inputRedirFlag == true)
 						{
-							// code for input redirection
+							if (strcmp(inputRedirLoc, "") != 0)
+							{
+								fdin = open(inputRedirLoc, O_RDONLY);
+								if (fdin == -1)
+								{
+									fprintf(stderr, "cannot open %s for input\n", inputRedirLoc);
+									fflush(stderr);
+									exit(1);
+								}
+								daijoubu = dup2(fdin, STDIN_FILENO);
+								if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+								fcntl(fdin, F_SETFD, FD_CLOEXEC);
+							}
 						}
+
 						if (outputRedirFlag == true)
 						{
-							// code for output redirection
+							if (strcmp(outputRedirLoc, "") != 0)
+							{
+								fdout = open(outputRedirLoc, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+								if (fdout == -1)
+								{
+									fprintf(stderr, "cannot open %s for output\n", outputRedirLoc);
+									fflush(stderr);
+									exit(1);
+								}
+								daijoubu = dup2(fdout, STDOUT_FILENO);
+								if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+								fcntl(fdout, F_SETFD, FD_CLOEXEC);
+							}
 						}
 					}
 					// background and background is allowed
 					else
 					{
+						fdin = open("/dev/null", O_RDONLY);
+						if (fdin == -1)
+								{
+									fprintf(stderr, "cannot open /dev/null for input\n",);
+									fflush(stderr);
+									exit(1);
+								}
+						daijoubu = dup2(fdin, STDIN_FILENO);
+						if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+						fcntl(fdin, F_SETFD, FD_CLOEXEC);
+
+						fdout = open("/dev/null", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+						if (fdout == -1)
+								{
+									fprintf(stderr, "cannot open /dev/null for output\n");
+									fflush(stderr);
+									exit(1);
+								}
+						daijoubu = dup2(fdout, STDOUT_FILENO);
+						if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+						fcntl(fdout, F_SETFD, FD_CLOEXEC);
+
 						if (inputRedirFlag == true)
 						{
-							// code for input redirection
+							if (strcmp(inputRedirLoc, "") != 0)
+							{
+								fdin = open(inputRedirLoc, O_RDONLY);
+								if (fdin == -1)
+								{
+									fprintf(stderr, "cannot open %s for input\n", inputRedirLoc);
+									fflush(stderr);
+									exit(1);
+								}
+								daijoubu = dup2(fdin, STDIN_FILENO);
+								if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+								fcntl(fdin, F_SETFD, FD_CLOEXEC);
+							}
 						}
+
 						if (outputRedirFlag == true)
 						{
-							// code for output redirection
+							if (strcmp(outputRedirLoc, "") != 0)
+							{
+								fdout = open(outputRedirLoc, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+								if (fdout == -1)
+								{
+									fprintf(stderr, "cannot open %s for output\n", outputRedirLoc);
+									fflush(stderr);
+									exit(1);
+								}
+								daijoubu = dup2(fdout, STDOUT_FILENO);
+								if (daijoubu == -1)
+								{
+									fprintf(stderr, "error with dup2\n");
+									fflush(stderr);
+									exit(1);
+								}
+								fcntl(fdout, F_SETFD, FD_CLOEXEC);
+							}
 						}
 					}
-					// exec
-					printf("invalid command\n");
-					fflush(stdout);
+
+					int execStatus = execvp(commandArgs[0], commandArgs)
+					if (execStatus == -1)
+					{
+						fprintf(stderr, "%s: no such file or directory\n", commandArgs[0]);
+						fflush(stderr);
+						exit(1);
+					}
+
+					fprintf(stderr, "invalid command\n");
+					fflush(stderr);
 					exit(1);
 				default: // parent process
 					if (bgProcessFlag == true && allowBGFlag == true)
@@ -164,6 +305,8 @@ int main()
 		else
 		{
 			// bad things happened
+			printf("undefined action\n");
+			fflush(stdout);
 		}
 		checkBGProcesses();
 	}
@@ -309,7 +452,6 @@ void parseInput()
 	{
 		bgProcessFlag = true;
 	}
-
 	if (commandArgs[0][0] == '#')
 	{
 		commentInputFlag = true;
@@ -372,7 +514,7 @@ void checkBGProcesses()
 	fflush(stdout);
 }
 
-void catchSIGTSTP()
+void catchSIGTSTP(int signo)
 {
 	// signal code referenced from signals slides
 	if (allowBGFlag == true)
