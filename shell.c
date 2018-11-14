@@ -117,19 +117,21 @@ int main()
 				chdir(getenv("HOME"));
 			}
 		}
+
 		else if (externalCommandFlag == true)
 		{
 			pid_t spawnPid = -5;
 			spawnPid = fork();
+			int fdin = 0;
+			int fdout = 0;
+			int daijoubu = 0;
 			switch(spawnPid)
 			{
 				case -1:
 					printf("fork failed\n");
 					fflush(stdout);
 				case 0: ;// child
-					int fdin = 0;
-					int fdout = 0;
-					int daijoubu = 0;
+					
 
 					// signal stuff for children to ignore ctrl+z
 					sigaction(SIGTSTP, &ignore_action, NULL);
@@ -450,7 +452,7 @@ void parseInput()
 		// next argument
 		token = strtok(NULL, " ");
 	}
-	if(isBGLastArg = true)
+	if(isBGLastArg == true)
 	{
 		bgProcessFlag = true;
 	}
