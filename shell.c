@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 
 // type def to use bool as a data type
 typedef int bool;
@@ -384,10 +385,10 @@ void getInput()
 	// from stackoverflow on how signals can stop fgets mid system call
 	// https://stackoverflow.com/questions/46146240/why-does-alarm-cause-fgets-to-stop-waiting
 	do {
-		int errno = 0;
+		errno = 0;
 		fgets(inputString, sizeof(inputString), stdin);
 	} while (EINTR == errno);
-	inputString[strlen(userInput)-1] = '\0';
+	inputString[strlen(inputString)-1] = '\0';
 }
 
 void parseInput()
