@@ -400,6 +400,7 @@ void parseInput()
 	if (strcmp(inputString, "") == 0)
 	{
 		emptyInputFlag = true;
+		commandArgs[0] = strdup("");
 	}
 
 	char *token = strtok(inputString, " ");
