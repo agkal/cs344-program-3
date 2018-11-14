@@ -525,14 +525,14 @@ void catchSIGTSTP(int signo)
 	{
 		allowBGFlag = false;
 		char* message = "\nEntering foreground-only mode (& is now ignored)\n";
-		write(1, message, 50);
+		write(1, message, 51);
 		fflush(stdout);
 	}
 	else
 	{
 		allowBGFlag = true;
 		char* message = "\nExiting foreground-only mode\n";
-		write (1, message, 30);
+		write (1, message, 31);
 		fflush(stdout);
 	}
 }
