@@ -442,9 +442,9 @@ void parseInput()
 					&& commandArgs[numArgs][curChar + 1] == '$')
 				{
 					commandArgs[numArgs][curChar] = '\0';
-					sprintf(commandArgs[numArgs], "%s%d%s",
-						commandArgs[numArgs], pid,
-						commandArgs[numArgs][curChar + 2]);
+					sprintf(commandArgs[numArgs], "%s%d",
+						commandArgs[numArgs], pid);//,
+						//commandArgs[numArgs][curChar + 2]);
 				}
 			}
 
