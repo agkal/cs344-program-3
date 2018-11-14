@@ -33,8 +33,8 @@ char outputRedirLoc[512];
 int fgStatusCode = 0;
 
 int bgProcessArray[513];
-bool bgProcessNum = -5;
-bool allowBGFlag == true;
+int bgProcessNum = -5;
+bool allowBGFlag = true;
 
 bool exitFlag = false;
 
@@ -109,7 +109,7 @@ int main()
 		{
 			if (commandArgs[1] != NULL)
 			{
-				chdir(commandArgs[1])
+				chdir(commandArgs[1]);
 			}
 			else
 			{
@@ -118,7 +118,7 @@ int main()
 		}
 		else if (externalCommandFlag == true)
 		{
-			pid_t spawnPid = -5
+			pid_t spawnPid = -5;
 			spawnPid = fork();
 			switch(spawnPid)
 			{
@@ -193,7 +193,7 @@ int main()
 						fdin = open("/dev/null", O_RDONLY);
 						if (fdin == -1)
 								{
-									fprintf(stderr, "cannot open /dev/null for input\n",);
+									fprintf(stderr, "cannot open /dev/null for input\n");
 									fflush(stderr);
 									exit(1);
 								}
@@ -267,7 +267,7 @@ int main()
 						}
 					}
 
-					int execStatus = execvp(commandArgs[0], commandArgs)
+					int execStatus = execvp(commandArgs[0], commandArgs);
 					if (execStatus == -1)
 					{
 						fprintf(stderr, "%s: no such file or directory\n", commandArgs[0]);
@@ -291,7 +291,7 @@ int main()
 					else if (bgProcessFlag == false)
 					{
 						// wait for child process
-						pid_t pidOutput = waitpid(bgProcessArray[i], &fgStatusCode, 0);
+						pid_t pidOutput = waitpid(spawnPid, &fgStatusCode, 0);
 						// if signal terminated printout
 						if (WIFSIGNALED(fgStatusCode) != 0)
 						{
@@ -322,11 +322,11 @@ void initShellState()
 	for (i = 0; i < 513; ++i)
 	{
 		commandArgs[i] = NULL;
-		bgProcessArray[i] = -5
+		bgProcessArray[i] = -5;
 	}
 
 	bool bgProcessNum = 0;
-	bool allowBGFlag == true;
+	bool allowBGFlag = true;
 
 	bool emptyInputFlag = false;
 	bool commentInputFlag = false;
@@ -497,7 +497,7 @@ void checkBGProcesses()
 		{
 			int childExitMethod = -5;
 			pid_t pidOutput = waitpid(bgProcessArray[i], &childExitMethod, WNOHANG);
-			if (pidOuput > 0)
+			if (pidOutput > 0)
 			{
 				printf("background pid %d is done: ", bgProcessArray[i]);
 				if (WIFEXITED(childExitMethod) != 0)
