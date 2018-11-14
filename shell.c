@@ -326,27 +326,27 @@ void initShellState()
 		bgProcessArray[i] = -5;
 	}
 
-	bool bgProcessNum = 0;
-	bool allowBGFlag = true;
+	bgProcessNum = 0;
+	allowBGFlag = true;
 
-	bool emptyInputFlag = false;
-	bool commentInputFlag = false;
-	bool exitCommandFlag = false;
-	bool statusCommandFlag = false;
-	bool cdCommandFlag = false;
+	emptyInputFlag = false;
+	commentInputFlag = false;
+	exitCommandFlag = false;
+	statusCommandFlag = false;
+	cdCommandFlag = false;
 
-	bool externalCommandFlag = false;
-	bool bgProcessFlag = false;
+	externalCommandFlag = false;
+	bgProcessFlag = false;
 
-	bool inputRedirFlag = false;
+	inputRedirFlag = false;
 	memset(inputRedirLoc, sizeof(outputRedirLoc), '\0');
 	
-	bool outputRedirFlag = false;
+	outputRedirFlag = false;
 	memset(outputRedirLoc, sizeof(outputRedirLoc), '\0');
 
-	int fgStatusCode = -5;
+	fgStatusCode = -5;
 
-	bool exitFlag = false;
+	exitFlag = false;
 }
 
 void resetCommandStateVariables()
@@ -360,22 +360,22 @@ void resetCommandStateVariables()
 		commandArgs[i] = NULL;
 	}
 
-	bool emptyInputFlag = false;
-	bool commentInputFlag = false;
-	bool exitCommandFlag = false;
-	bool statusCommandFlag = false;
-	bool cdCommandFlag = false;
+	emptyInputFlag = false;
+	commentInputFlag = false;
+	exitCommandFlag = false;
+	statusCommandFlag = false;
+	cdCommandFlag = false;
 
-	bool externalCommandFlag = false;
-	bool bgProcessFlag = false;
+	externalCommandFlag = false;
+	bgProcessFlag = false;
 
-	bool inputRedirFlag = false;
+	inputRedirFlag = false;
 	memset(inputRedirLoc, sizeof(outputRedirLoc), '\0');
 	
-	bool outputRedirFlag = false;
+	outputRedirFlag = false;
 	memset(outputRedirLoc, sizeof(outputRedirLoc), '\0');
 
-	bool exitFlag = false;
+	exitFlag = false;
 }
 
 void getInput()
@@ -521,14 +521,14 @@ void catchSIGTSTP(int signo)
 	// signal code referenced from signals slides
 	if (allowBGFlag == true)
 	{
-		allowBGFlag == false;
+		allowBGFlag = false;
 		char* message = "Entering foreground-only mode (& is now ignored)\n";
 		write(1, message, 49);
 		fflush(stdout);
 	}
 	else
 	{
-		allowBGFlag == true;
+		allowBGFlag = true;
 		char* message = "Exiting foreground-only mode\n";
 		write (1, message, 29);
 		fflush(stdout);
