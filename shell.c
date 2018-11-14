@@ -125,10 +125,10 @@ int main()
 				case -1:
 					printf("fork failed\n");
 					fflush(stdout);
-				case 0: // child
-					int fdin;
-					int fdout;
-					int daijoubu;
+				case 0: ;// child
+					int fdin = 0;
+					int fdout = 0;
+					int daijoubu = 0;
 
 					// signal stuff for children to ignore ctrl+z
 					sigaction(SIGTSTP, &ignore_action, NULL);
@@ -384,10 +384,10 @@ void getInput()
 	// from stackoverflow on how signals can stop fgets mid system call
 	// https://stackoverflow.com/questions/46146240/why-does-alarm-cause-fgets-to-stop-waiting
 	do {
-		errno = 0;
+		int errno = 0;
 		fgets(inputString, sizeof(inputString), stdin);
 	} while (EINTR == errno);
-	inputString[strlen(userInput)-1] = '\0'
+	inputString[strlen(userInput)-1] = '\0';
 }
 
 void parseInput()
