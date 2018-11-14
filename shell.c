@@ -442,7 +442,7 @@ void parseInput()
 				{
 					commandArgs[numArgs][curChar] = '\0';
 					sprintf(commandArgs[numArgs], "%s%d",
-						commandArgs[numArgs][curChar], pid);//,
+						commandArgs[numArgs], pid);//,
 						//commandArgs[numArgs][curChar + 2]);
 				}
 			}
