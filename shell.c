@@ -453,7 +453,7 @@ void parseInput()
 		// next argument
 		token = strtok(NULL, " ");
 	}
-	if(isBGLastArg == true)
+	if(isBGLastArg == true && allowBGFlag == true)
 	{
 		bgProcessFlag = true;
 	}
