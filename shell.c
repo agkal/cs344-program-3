@@ -52,48 +52,56 @@ void catchSIGTSTP(int signo);
 int main()
 {
 	// signal code heavily referenced from in class powerpoint
-	// signal stuff goes here
+	// signal stuff for SIGINT
 	struct sigaction SIGINT_action = {0};
 	SIGINT_action.sa_handler = SIG_DFL;
 	sigfillset(&SIGINT_action.sa_mask);
 	SIGINT_action.sa_flags = 0;
 
+	// signal stuff for SIGTSTP
 	struct sigaction SIGTSTP_action = {0};
 	SIGTSTP_action.sa_handler = catchSIGTSTP;
 	sigfillset(&SIGTSTP_action.sa_mask);
 	SIGTSTP_action.sa_flags = 0;
 
+	// signal stuff for ignoring signals
 	struct sigaction ignore_action = {0};
 	ignore_action.sa_handler = SIG_IGN;
 
+	// call sigaction
 	sigaction(SIGINT, &ignore_action, NULL);
 	sigaction(SIGTSTP, &SIGTSTP_action, NULL);
 
-
-	// call sigaction
-
+	// init the shell state
 	initShellState();
 
+	// while the shell is not set to exit keep running
 	while(exitFlag != true)
 	{
+		// following functions do as what their names say
 		resetCommandStateVariables();
 		getInput();
 		//dollarSignExpansion();
 		parseInput();
 
+		// handle built in functions
+		// empty
 		if (emptyInputFlag == true)
 		{
 			continue;
 		}
+		// comment
 		else if (commentInputFlag == true)
 		{
 			continue;
 		}
+		// exit
 		else if (exitCommandFlag == true)
 		{
 			killBGProcesses();
 			exitFlag = true;
 		}
+		// status
 		else if (statusCommandFlag == true)
 		{
 			if (WIFEXITED(fgStatusCode) != 0)
@@ -106,6 +114,7 @@ int main()
 			}
 			fflush(stdout);
 		}
+		// cd
 		else if (cdCommandFlag == true)
 		{
 			if (commandArgs[1] != NULL)
@@ -117,7 +126,7 @@ int main()
 				chdir(getenv("HOME"));
 			}
 		}
-
+		// external command
 		else if (externalCommandFlag == true)
 		{
 			pid_t spawnPid = -5;
@@ -127,7 +136,7 @@ int main()
 			int daijoubu = 0;
 			switch(spawnPid)
 			{
-				case -1:
+				case -1: // fork failed
 					printf("fork failed\n");
 					fflush(stdout);
 				case 0: ;// child
@@ -136,6 +145,7 @@ int main()
 					// signal stuff for children to ignore ctrl+z
 					sigaction(SIGTSTP, &ignore_action, NULL);
 
+					// catch error with state, should never get into this if statement
 					if (bgProcessFlag == true && allowBGFlag == false)
 					{
 						exit(-5);
@@ -146,6 +156,7 @@ int main()
 						// signal stuff for foreground and ctrl+c
 						sigaction(SIGINT, &SIGINT_action, NULL);
 
+						// input redirection
 						if (inputRedirFlag == true)
 						{
 							if (strcmp(inputRedirLoc, "") != 0)
@@ -167,7 +178,7 @@ int main()
 								fcntl(fdin, F_SETFD, FD_CLOEXEC);
 							}
 						}
-
+						// output redirection
 						if (outputRedirFlag == true)
 						{
 							if (strcmp(outputRedirLoc, "") != 0)
@@ -193,6 +204,7 @@ int main()
 					// background and background is allowed
 					else
 					{
+						// default redirection for background processes
 						fdin = open("/dev/null", O_RDONLY);
 						if (fdin == -1)
 								{
@@ -225,6 +237,7 @@ int main()
 								}
 						fcntl(fdout, F_SETFD, FD_CLOEXEC);
 
+						// input redirection for background process
 						if (inputRedirFlag == true)
 						{
 							if (strcmp(inputRedirLoc, "") != 0)
@@ -247,6 +260,7 @@ int main()
 							}
 						}
 
+						// output redirection for background process
 						if (outputRedirFlag == true)
 						{
 							if (strcmp(outputRedirLoc, "") != 0)
@@ -270,6 +284,7 @@ int main()
 						}
 					}
 
+					// exec code handle if error
 					int execStatus = execvp(commandArgs[0], commandArgs);
 					if (execStatus == -1)
 					{
@@ -277,11 +292,12 @@ int main()
 						fflush(stderr);
 						exit(1);
 					}
-
+					// should never get here
 					fprintf(stderr, "invalid command\n");
 					fflush(stderr);
 					exit(1);
 				default: // parent process
+					// if background
 					if (bgProcessFlag == true && allowBGFlag == true)
 					{
 						// add to BGarray
@@ -291,7 +307,7 @@ int main()
 						printf("background pid is %d\n", spawnPid);
 						fflush(stdout);
 					}
-					else if (bgProcessFlag == false)
+					else if (bgProcessFlag == false) // if foreground
 					{
 						// wait for child process
 						pid_t pidOutput = waitpid(spawnPid, &fgStatusCode, 0);
@@ -311,11 +327,13 @@ int main()
 			printf("undefined action\n");
 			fflush(stdout);
 		}
+		// check to see if any background children have died before giving back controll to user
 		checkBGProcesses();
 	}
 	return 0;
 }
 
+// sets all variables to initial state when shell first starts
 void initShellState()
 {
 
@@ -351,6 +369,7 @@ void initShellState()
 	exitFlag = false;
 }
 
+// resets all variables needed for each loop to work
 void resetCommandStateVariables()
 {
 	memset(inputString, sizeof(inputString), '\0');
@@ -380,6 +399,7 @@ void resetCommandStateVariables()
 	exitFlag = false;
 }
 
+// gets input simple as that
 void getInput()
 {
 	// from stackoverflow on how signals can stop fgets mid system call
@@ -393,12 +413,15 @@ void getInput()
 	inputString[strlen(inputString)-1] = '\0';
 }
 
+// parses input and makes sense of it
 void parseInput()
 {
 	bool isBGLastArg = false;
 	int numArgs = 0;
 	int pid = getpid();
 
+	// if input string is empty
+	// avoids seg fault
 	if (strcmp(inputString, "") == 0)
 	{
 		emptyInputFlag = true;
@@ -407,8 +430,10 @@ void parseInput()
 
 	char *token = strtok(inputString, " ");
 
+	// strtok the string into workable pieces
 	while (token != NULL)
 	{
+		// handle input redirection
 		if (strcmp(token, "<") == 0)
 		{
 			isBGLastArg = false;
@@ -416,6 +441,7 @@ void parseInput()
 			token = strtok(NULL, " ");
 			strcpy(inputRedirLoc, token);
 		}
+		// handle output redirection
 		else if (strcmp(token, ">") == 0)
 		{
 			isBGLastArg = false;
@@ -423,6 +449,7 @@ void parseInput()
 			token = strtok(NULL, " ");
 			strcpy(outputRedirLoc, token);
 		}
+		// handle background process
 		else if (strcmp(token, "&") == 0)
 		{
 			isBGLastArg = true;
@@ -433,7 +460,7 @@ void parseInput()
 			commandArgs[numArgs] = strdup(token);
 
 			// simple way to do $$ expansion
-			// borrowed from friend
+			// Credit to Brent Irway
 			int curChar;
 			for (curChar = 0; commandArgs[numArgs][curChar]; ++curChar)
 			{
@@ -453,6 +480,8 @@ void parseInput()
 		// next argument
 		token = strtok(NULL, " ");
 	}
+
+	// sets flags for what command was inputed based on what was put in commandArgs array
 	if(isBGLastArg == true && allowBGFlag == true)
 	{
 		bgProcessFlag = true;
@@ -479,6 +508,8 @@ void parseInput()
 	}
 }
 
+// function kills all background processes
+// it gets called when exit is run
 void killBGProcesses()
 {
 	int i;
@@ -493,6 +524,8 @@ void killBGProcesses()
 	}
 }
 
+// checks background processes to see if any of them have terminated
+// print message based on how they terminated
 void checkBGProcesses()
 {
 	int i;
@@ -519,6 +552,9 @@ void checkBGProcesses()
 	fflush(stdout);
 }
 
+// function to catch SIGTSTP
+// prints out message to terminal about foreground-only state
+// and toggles forground-only state
 void catchSIGTSTP(int signo)
 {
 	// signal code referenced from signals slides
